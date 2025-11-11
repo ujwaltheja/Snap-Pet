@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Snap Pet</string>
+    <string name="home_screen">Home</string>
+    <string name="selector_screen">Pet Selector</string>
+    <string name="shop_screen">Shop</string>
+    <string name="inventory_screen">Inventory</string>
+    <string name="settings_screen">Settings</string>
+    <string name="debug_screen">Debug</string>
+
+    <!-- Accessibility -->
+    <string name="pet_image_description">Your virtual pet</string>
+    <string name="tap_pet">Tap pet</string>
+    <string name="feed_pet">Feed pet</string>
+    <string name="play_with_pet">Play with pet</string>
+    <string name="record_voice">Record voice</string>
+    <string name="take_screenshot">Take screenshot</string>
+
+    <!-- Needs -->
+    <string name="hunger">Hunger</string>
+    <string name="happiness">Happiness</string>
+    <string name="energy">Energy</string>
+
+    <!-- Actions -->
+    <string name="feed">Feed</string>
+    <string name="play">Play</string>
+    <string name="pet_action">Pet</string>
+    <string name="poke">Poke</string>
+    <string name="record">Record</string>
+    <string name="stop_recording">Stop Recording</string>
+    <string name="play_recording">Play Recording</string>
+
+    <!-- Currency -->
+    <string name="coins">Coins</string>
+
+    <!-- Shop -->
+    <string name="buy">Buy</string>
+    <string name="equip">Equip</string>
+    <string name="unequip">Unequip</string>
+    <string name="insufficient_funds">Not enough coins!</string>
+
+    <!-- Permissions -->
+    <string name="permission_audio_required">Audio recording permission is required for voice playback feature</string>
+</resources>
