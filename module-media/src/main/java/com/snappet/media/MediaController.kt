@@ -5,12 +5,13 @@ import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.AudioTrack
 import android.media.MediaRecorder
-import be.tarsos.dsp.AudioDispatcher
-import be.tarsos.dsp.AudioEvent
-import be.tarsos.dsp.AudioProcessor
-import be.tarsos.dsp.io.TarsosDSPAudioFormat
-import be.tarsos.dsp.io.android.AudioDispatcherFactory
-import be.tarsos.dsp.pitch.PitchShifter
+// TODO: Re-enable when TarsosDSP dependency is fixed
+// import be.tarsos.dsp.AudioDispatcher
+// import be.tarsos.dsp.AudioEvent
+// import be.tarsos.dsp.AudioProcessor
+// import be.tarsos.dsp.io.TarsosDSPAudioFormat
+// import be.tarsos.dsp.io.android.AudioDispatcherFactory
+// import be.tarsos.dsp.pitch.PitchShifter
 import com.snappet.utils.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

@@ -66,7 +66,9 @@ class Logger(private val logDir: File? = null) {
         // Optionally write to file
         logDir?.let { dir ->
             try {
-                if (!dir.exists()) dir.mkdirs()
+                if (!dir.exists()) {
+                    dir.mkdirs()
+                }
                 val logFile = File(dir, "snap_pet_log.txt")
                 val timestamp = dateFormat.format(Date(event.timestamp))
                 val logLine = "$timestamp [${level.name}] $tag: $message\n"
@@ -75,8 +77,10 @@ class Logger(private val logDir: File? = null) {
                 // Rotate log if too large (> 1MB)
                 if (logFile.length() > 1024 * 1024) {
                     val backupFile = File(dir, "snap_pet_log_old.txt")
-                    if (backupFile.exists()) backupFile.delete()
+                    backupFile.delete()
                     logFile.renameTo(backupFile)
+                } else {
+                    // Keep old log as backup, do nothing
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to write to log file", e)

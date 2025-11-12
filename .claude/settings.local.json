@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.gradlew assembleDebug:*)",
+      "Bash(gradlew assembleDebug:*)",
+      "Bash(git checkout:*)",
+      "Bash(gradle assemble:*)",
+      "Bash(./gradlew assemble:*)",
+      "Bash(for:*)",
+      "Bash(do sed -i 's/minSdk = 24/minSdk = 26/g' \"$file\")",
+      "Bash(done)",
+      "Bash(./gradlew assembleDebug:*)",
+      "Bash(gradle assembleDebug:*)",
+      "Bash(java:*)",
+      "Bash(adb logcat:*)",
+      "Bash(adb install:*)",
+      "Bash(adb shell:*)",
+      "Bash(adb uninstall:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

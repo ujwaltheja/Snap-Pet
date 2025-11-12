@@ -8,5 +8,5 @@
 # Keep Lottie
 -keep class com.airbnb.lottie.** { *; }
 
-# Keep TarsosDSP
--keep class be.tarsos.dsp.** { *; }
+# Keep TarsosDSP (disabled: dependency removed)
+# -keep class be.tarsos.dsp.** { *; }
