@@ -86,6 +86,7 @@ class PetController(
                 hunger = petEntity.hunger,
                 happiness = petEntity.happiness,
                 energy = petEntity.energy,
+                hygiene = petEntity.hygiene,
                 lastUpdated = petEntity.lastUpdated,
                 equippedHat = petEntity.equippedHat,
                 equippedSkin = petEntity.equippedSkin,
@@ -114,6 +115,7 @@ class PetController(
             Interaction.FEED -> state.feed()
             Interaction.PLAY -> state.play()
             Interaction.REST -> state.rest()
+            Interaction.CLEAN -> state.clean()
         }
 
         _currentPetState.value = newState
@@ -159,6 +161,7 @@ class PetController(
             hunger = state.hunger,
             happiness = state.happiness,
             energy = state.energy,
+            hygiene = state.hygiene,
             lastUpdated = state.lastUpdated,
             equippedHat = state.equippedHat,
             equippedSkin = state.equippedSkin,

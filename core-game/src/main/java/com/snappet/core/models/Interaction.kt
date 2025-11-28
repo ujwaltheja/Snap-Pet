@@ -9,5 +9,6 @@ enum class Interaction {
     POKE,
     FEED,
     PLAY,
-    REST
+    REST,
+    CLEAN
 }

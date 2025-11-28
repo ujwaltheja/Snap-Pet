@@ -8,6 +8,7 @@ data class PetState(
     val hunger: Float = 100f, // 0-100, decreases over time
     val happiness: Float = 100f, // 0-100, decreases over time
     val energy: Float = 100f, // 0-100, decreases over time
+    val hygiene: Float = 100f, // 0-100, decreases over time
     val lastUpdated: Long = System.currentTimeMillis(),
     val equippedHat: String? = null,
     val equippedSkin: String? = null,
@@ -18,6 +19,7 @@ data class PetState(
         const val HUNGER_DECAY_PER_SECOND = 0.01f // ~100 seconds to deplete
         const val HAPPINESS_DECAY_PER_SECOND = 0.008f
         const val ENERGY_DECAY_PER_SECOND = 0.005f
+        const val HYGIENE_DECAY_PER_SECOND = 0.007f
 
         // Interaction effects
         const val FEED_HUNGER_INCREASE = 30f
@@ -27,6 +29,8 @@ data class PetState(
         const val PET_HAPPINESS_INCREASE = 15f
         const val POKE_HAPPINESS_DECREASE = 5f
         const val REST_ENERGY_INCREASE = 40f
+        const val CLEAN_HYGIENE_INCREASE = 40f
+        const val CLEAN_HAPPINESS_INCREASE = 10f
     }
 
     /**
@@ -42,6 +46,7 @@ data class PetState(
             hunger = (hunger - HUNGER_DECAY_PER_SECOND * elapsedSeconds).clamp(),
             happiness = (happiness - HAPPINESS_DECAY_PER_SECOND * elapsedSeconds).clamp(),
             energy = (energy - ENERGY_DECAY_PER_SECOND * elapsedSeconds).clamp(),
+            hygiene = (hygiene - HYGIENE_DECAY_PER_SECOND * elapsedSeconds).clamp(),
             lastUpdated = System.currentTimeMillis()
         )
     }
@@ -98,6 +103,18 @@ data class PetState(
     fun rest(): PetState {
         return copy(
             energy = (energy + REST_ENERGY_INCREASE).clamp(),
+            lastUpdated = System.currentTimeMillis()
+        )
+    }
+
+    /**
+     * Apply clean (restore hygiene).
+     */
+    fun clean(): PetState {
+        return copy(
+            hygiene = (hygiene + CLEAN_HYGIENE_INCREASE).clamp(),
+            happiness = (happiness + CLEAN_HAPPINESS_INCREASE).clamp(),
+            totalInteractions = totalInteractions + 1,
             lastUpdated = System.currentTimeMillis()
         )
     }

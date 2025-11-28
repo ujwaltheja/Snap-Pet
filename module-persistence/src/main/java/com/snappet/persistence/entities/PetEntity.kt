@@ -13,6 +13,7 @@ data class PetEntity(
     val hunger: Float,
     val happiness: Float,
     val energy: Float,
+    val hygiene: Float = 100f,
     val lastUpdated: Long,
     val equippedHat: String?,
     val equippedSkin: String?,
