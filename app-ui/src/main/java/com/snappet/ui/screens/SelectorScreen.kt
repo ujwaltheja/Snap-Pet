@@ -101,9 +101,22 @@ fun SelectorScreen(
                             pet = pet,
                             isUnlocked = isUnlocked,
                             isSelected = isSelected,
+                            userCoins = user?.coins ?: 0,
                             onSelect = {
                                 if (isUnlocked) {
                                     scope.launch {
+                                        user?.let { u ->
+                                            persistenceRepository.updateUser(u.copy(selectedPetId = pet.id))
+                                            petController.loadPet(pet.id)
+                                        }
+                                    }
+                                }
+                            },
+                            onUnlock = {
+                                scope.launch {
+                                    val success = persistenceRepository.unlockPet(pet.id, pet.unlockCost)
+                                    if (success) {
+                                        // Automatically select the newly unlocked pet
                                         user?.let { u ->
                                             persistenceRepository.updateUser(u.copy(selectedPetId = pet.id))
                                             petController.loadPet(pet.id)
@@ -124,7 +137,9 @@ fun PetCard(
     pet: Pet,
     isUnlocked: Boolean,
     isSelected: Boolean,
-    onSelect: () -> Unit
+    userCoins: Int,
+    onSelect: () -> Unit,
+    onUnlock: () -> Unit = {}
 ) {
     Card3D(
         modifier = Modifier
@@ -238,25 +253,37 @@ fun PetCard(
                 }
             }
 
-            // Selected indicator with glow
-            if (isSelected) {
-                PulsingCard(
-                    modifier = Modifier.size(48.dp),
-                    backgroundColor = SnapPetTheme.colors.primary,
-                    pulseColor = SnapPetTheme.colors.primary
-                ) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.fillMaxSize()
+            // Selected indicator or Buy button
+            if (isUnlocked) {
+                if (isSelected) {
+                    PulsingCard(
+                        modifier = Modifier.size(48.dp),
+                        backgroundColor = SnapPetTheme.colors.primary,
+                        pulseColor = SnapPetTheme.colors.primary
                     ) {
-                        Icon(
-                            Icons.Default.Check,
-                            contentDescription = "Selected",
-                            tint = Color.White,
-                            modifier = Modifier.size(28.dp)
-                        )
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            Icon(
+                                Icons.Default.Check,
+                                contentDescription = "Selected",
+                                tint = Color.White,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
                     }
                 }
+            } else {
+                Button3D(
+                    onClick = onUnlock,
+                    text = "Buy",
+                    enabled = userCoins >= pet.unlockCost,
+                    backgroundColor = if (userCoins >= pet.unlockCost)
+                        SnapPetTheme.colors.primary else Color.Gray,
+                    height = 48.dp,
+                    modifier = Modifier.width(100.dp)
+                )
             }
         }
     }

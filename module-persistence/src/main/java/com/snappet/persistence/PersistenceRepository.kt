@@ -39,6 +39,45 @@ class PersistenceRepository(context: Context) {
     suspend fun updateItem(item: ItemEntity) = itemDao.updateItem(item)
 
     /**
+     * Unlock a pet by deducting coins from user and adding pet to unlocked list.
+     * Returns true if successful, false if insufficient funds or already unlocked.
+     */
+    suspend fun unlockPet(petId: String, cost: Int): Boolean {
+        val user = getUser() ?: return false
+
+        // Check if already unlocked
+        val unlockedPets = user.unlockedPetIds.split(",").map { it.trim() }
+        if (unlockedPets.contains(petId)) return false
+
+        // Check if enough coins
+        if (user.coins < cost) return false
+
+        // Deduct coins and add to unlocked list
+        val newUnlockedPets = (unlockedPets + petId).joinToString(",")
+        val updatedUser = user.copy(
+            coins = user.coins - cost,
+            unlockedPetIds = newUnlockedPets
+        )
+        updateUser(updatedUser)
+
+        // Create default pet state for newly unlocked pet
+        savePet(
+            PetEntity(
+                petId = petId,
+                hunger = 100f,
+                happiness = 100f,
+                energy = 100f,
+                lastUpdated = System.currentTimeMillis(),
+                equippedHat = null,
+                equippedSkin = null,
+                totalInteractions = 0
+            )
+        )
+
+        return true
+    }
+
+    /**
      * Initialize default data if database is empty.
      */
     suspend fun initializeDefaults() {

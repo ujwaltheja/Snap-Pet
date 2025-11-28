@@ -1,8 +1,11 @@
 package com.snappet.ui.screens
 
+import android.Manifest
 import android.content.Context
 import android.os.VibrationEffect
 import android.os.Vibrator
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -61,7 +64,18 @@ fun HomeScreen(
     var isRecording by remember { mutableStateOf(false) }
     var recordingFile by remember { mutableStateOf<File?>(null) }
     var showMessage by remember { mutableStateOf<String?>(null) }
-    
+    var hasAudioPermission by remember { mutableStateOf(false) }
+
+    // Audio permission launcher
+    val audioPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        hasAudioPermission = isGranted
+        if (!isGranted) {
+            showMessage = "Microphone permission required for voice recording"
+        }
+    }
+
     // Reward States
     var dailyReward by remember { mutableStateOf<com.snappet.core.DailyReward?>(null) }
     var levelUpLevel by remember { mutableStateOf<Int?>(null) }
@@ -364,23 +378,28 @@ fun HomeScreen(
                                     emoji = "🎤",
                                     onClick = {
                                         if (!isRecording) {
-                                            scope.launch {
-                                                isRecording = true
-                                                val result = mediaController.startRecording()
-                                                isRecording = false
-                                                when (result) {
-                                                    is MediaController.RecordingResult.Success -> {
-                                                        recordingFile = result.file
-                                                        showMessage = "Hehe! 🎵"
-                                                        val pitchShift =
-                                                            currentPet?.voiceEffect?.pitchShift ?: 1.0f
-                                                        mediaController.playWithEffect(
-                                                            result.file,
-                                                            pitchShift
-                                                        )
-                                                    }
+                                            // Check permission first
+                                            if (!hasAudioPermission) {
+                                                audioPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                                            } else {
+                                                scope.launch {
+                                                    isRecording = true
+                                                    val result = mediaController.startRecording()
+                                                    isRecording = false
+                                                    when (result) {
+                                                        is MediaController.RecordingResult.Success -> {
+                                                            recordingFile = result.file
+                                                            showMessage = "Hehe! 🎵"
+                                                            val pitchShift =
+                                                                currentPet?.voiceEffect?.pitchShift ?: 1.0f
+                                                            mediaController.playWithEffect(
+                                                                result.file,
+                                                                pitchShift
+                                                            )
+                                                        }
 
-                                                    else -> showMessage = "Oops! Try again"
+                                                        else -> showMessage = "Oops! Try again"
+                                                    }
                                                 }
                                             }
                                         }
