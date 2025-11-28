@@ -12,5 +12,7 @@ data class UserEntity(
     val id: Int = 1, // Always 1, single user
     val coins: Int,
     val selectedPetId: String,
-    val unlockedPetIds: String // Comma-separated list
+    val unlockedPetIds: String, // Comma-separated list
+    val lastLoginTime: Long = 0,
+    val loginStreak: Int = 0
 )

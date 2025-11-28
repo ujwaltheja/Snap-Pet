@@ -16,7 +16,7 @@ import com.snappet.persistence.entities.UserEntity
  */
 @Database(
     entities = [PetEntity::class, UserEntity::class, ItemEntity::class],
-    version = 1,
+    version = 3,
     exportSchema = true
 )
 abstract class SnapPetDatabase : RoomDatabase() {

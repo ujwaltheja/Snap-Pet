@@ -18,6 +18,7 @@ sealed class Screen(val route: String) {
     object Inventory : Screen("inventory")
     object Settings : Screen("settings")
     object Debug : Screen("debug")
+    object CatchGame : Screen("catch_game")
 }
 
 @Composable
@@ -71,6 +72,13 @@ fun SnapPetNavigation(
             DebugScreen(
                 navController = navController,
                 logger = logger
+            )
+        }
+
+        composable(Screen.CatchGame.route) {
+            CatchGameScreen(
+                navController = navController,
+                petController = petController
             )
         }
     }

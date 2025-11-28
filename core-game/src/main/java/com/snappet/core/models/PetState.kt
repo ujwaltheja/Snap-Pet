@@ -12,7 +12,9 @@ data class PetState(
     val lastUpdated: Long = System.currentTimeMillis(),
     val equippedHat: String? = null,
     val equippedSkin: String? = null,
-    val totalInteractions: Int = 0
+    val totalInteractions: Int = 0,
+    val xp: Long = 0,
+    val level: Int = 1
 ) {
     companion object {
         // Decay rates per second
@@ -126,6 +128,30 @@ data class PetState(
         return copy(
             equippedHat = hat ?: equippedHat,
             equippedSkin = skin ?: equippedSkin,
+            lastUpdated = System.currentTimeMillis()
+        )
+    }
+
+    /**
+     * Add XP and check for level up.
+     */
+    fun addXp(amount: Int): PetState {
+        val newXp = xp + amount
+        // Simple leveling formula: Level * 100 XP required for next level
+        // Level 1 -> 2: 100 XP
+        // Level 2 -> 3: 200 XP (Total 300)
+        var currentLevel = level
+        
+        // Check if we have enough XP to level up
+        // Threshold for Level L = 100 * L
+        // If xp > 100 * level, then level up.
+        
+        val xpThreshold = 100L * currentLevel
+        val finalLevel = if (newXp >= xpThreshold) currentLevel + 1 else currentLevel
+        
+        return copy(
+            xp = newXp,
+            level = finalLevel,
             lastUpdated = System.currentTimeMillis()
         )
     }

@@ -11,8 +11,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -20,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.snappet.persistence.entities.ItemEntity
 import com.snappet.store.StoreRepository
+import com.snappet.ui.components.*
 import com.snappet.ui.theme.*
 import kotlinx.coroutines.launch
 
@@ -32,66 +31,83 @@ fun InventoryScreen(
     val items by storeRepository.observeOwnedItems().collectAsState(initial = emptyList())
     val scope = rememberCoroutineScope()
 
-    // Background Gradient
-    val bgBrush = Brush.verticalGradient(
-        colors = listOf(BgGradientStart, BgGradientEnd)
-    )
-
-    Scaffold(
-        containerColor = Color.Transparent,
-        topBar = {
-            TopAppBar(
-                title = { Text("Inventory", fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(
-                        onClick = { navController.popBackStack() },
-                        colors = IconButtonDefaults.iconButtonColors(contentColor = GameOnSurface)
-                    ) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
-            )
-        }
-    ) { padding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(bgBrush)
-                .padding(padding)
-        ) {
-            if (items.isEmpty()) {
+    SnapPetTheme {
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
                 ) {
+                    SmallNavButton(
+                        icon = Icons.Default.ArrowBack,
+                        label = "Back",
+                        onClick = { navController.popBackStack() }
+                    )
+
                     Text(
-                        "No items owned yet. Visit the shop!",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = GameOnSurface.copy(alpha = 0.6f)
+                        text = "Inventory",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = SnapPetTheme.colors.textPrimary,
+                        modifier = Modifier.align(Alignment.Center)
                     )
                 }
-            } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(items) { item ->
-                        InventoryItemCard(
-                            item = item,
-                            onEquip = {
-                                scope.launch {
-                                    storeRepository.equipItem(item.itemId)
-                                }
-                            },
-                            onUnequip = {
-                                scope.launch {
-                                    storeRepository.unequipItem(item.itemId)
-                                }
-                            }
+            }
+        ) { padding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = SnapPetTheme.colors.background + listOf(
+                                SnapPetTheme.colors.background.last().copy(alpha = 0.8f)
+                            )
                         )
+                    )
+                    .padding(padding)
+            ) {
+                // Floating particles
+                FloatingParticles(
+                    modifier = Modifier.fillMaxSize(),
+                    particleColor = SnapPetTheme.colors.glow,
+                    particleCount = 15
+                )
+                if (items.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            "No items owned yet. Visit the shop!",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = SnapPetTheme.colors.textPrimary.copy(alpha = 0.6f)
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        contentPadding = PaddingValues(bottom = 24.dp)
+                    ) {
+                        items(items) { item ->
+                            InventoryItemCard(
+                                item = item,
+                                onEquip = {
+                                    scope.launch {
+                                        storeRepository.equipItem(item.itemId)
+                                    }
+                                },
+                                onUnequip = {
+                                    scope.launch {
+                                        storeRepository.unequipItem(item.itemId)
+                                    }
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -105,65 +121,99 @@ fun InventoryItemCard(
     onEquip: () -> Unit,
     onUnequip: () -> Unit
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(2.dp, RoundedCornerShape(16.dp))
-            .clip(RoundedCornerShape(16.dp)),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+    Card3D(
+        modifier = Modifier.fillMaxWidth(),
+        backgroundColor = Color.White.copy(alpha = 0.95f),
+        elevation = if (item.equipped) 16.dp else 12.dp,
+        glowColor = if (item.equipped)
+            SnapPetTheme.colors.primary else Color.Gray.copy(alpha = 0.2f)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(20.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = item.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = GameOnSurface
-                )
-                Text(
-                    text = item.type.uppercase(),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = GameOnSurface.copy(alpha = 0.6f)
-                )
-                if (item.equipped) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Currently equipped",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = GamePrimary,
-                        fontWeight = FontWeight.Bold
-                    )
+            // Icon with glow effect if equipped
+            if (item.equipped) {
+                PulsingCard(
+                    modifier = Modifier.size(72.dp),
+                    backgroundColor = SnapPetTheme.colors.primary.copy(alpha = 0.2f),
+                    pulseColor = SnapPetTheme.colors.primary
+                ) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Text(
+                            text = item.name.take(1),
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = SnapPetTheme.colors.primary
+                        )
+                    }
+                }
+            } else {
+                Card3D(
+                    modifier = Modifier.size(72.dp),
+                    backgroundColor = Color.Gray.copy(alpha = 0.1f),
+                    elevation = 8.dp,
+                    glowColor = Color.Gray
+                ) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Text(
+                            text = item.name.take(1),
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Gray
+                        )
+                    }
                 }
             }
 
-            if (item.equipped) {
-                Button(
-                    onClick = onUnequip,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = GameSecondary,
-                        contentColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text("Unequip")
-                }
-            } else {
-                Button(
-                    onClick = onEquip,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = GamePrimary,
-                        contentColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text("Equip")
+            Spacer(modifier = Modifier.width(20.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = item.name,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = SnapPetTheme.colors.textPrimary
+                )
+                Text(
+                    text = item.type.uppercase(),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = SnapPetTheme.colors.textSecondary.copy(alpha = 0.7f),
+                    fontWeight = FontWeight.SemiBold
+                )
+                if (item.equipped) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Surface(
+                        color = SnapPetTheme.colors.primary.copy(alpha = 0.15f),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = "✓ Equipped",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = SnapPetTheme.colors.primary,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                        )
+                    }
                 }
             }
+
+            Button3D(
+                onClick = if (item.equipped) onUnequip else onEquip,
+                text = if (item.equipped) "Remove" else "Equip",
+                backgroundColor = if (item.equipped)
+                    SnapPetTheme.colors.secondary else SnapPetTheme.colors.primary,
+                height = 48.dp,
+                modifier = Modifier.width(110.dp)
+            )
         }
     }
 }

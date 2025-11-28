@@ -20,7 +20,18 @@
       "Bash(./gradlew app-ui:assembleDebug:*)",
       "Bash(gradlew.bat:*)",
       "Bash(gradle app-ui:assembleDebug:*)",
-      "Bash(bash gradlew:*)"
+      "Bash(bash gradlew:*)",
+      "Bash(.gradlew.bat app-ui:assembleDebug --stacktrace)",
+      "Bash(cmd /c gradlew.bat app-ui:assembleDebug --stacktrace)",
+      "Bash(Select-String -Pattern \"error|Error|ERROR|exception|Exception|EXCEPTION\" -Context 2)",
+      "Bash(Select-Object -Last 50)",
+      "Bash(Select-String -Pattern \"snappet|AndroidRuntime|FATAL|crash\" -Context 5)",
+      "Bash(Select-Object -Last 100)",
+      "Bash(cmd /c \"gradlew.bat app-ui:assembleDebug --stacktrace 2>&1 | findstr /i /c:error /c:exception /c:fail\")",
+      "Bash(Select-Object -Last 200)",
+      "Bash(Select-String -Pattern \"crash|FATAL|AndroidRuntime|Exception|snappet\" -Context 3)",
+      "Bash(adb devices:*)",
+      "Bash(cmd /c \"gradlew.bat app-ui:assembleDebug --stacktrace\")"
     ],
     "deny": [],
     "ask": []

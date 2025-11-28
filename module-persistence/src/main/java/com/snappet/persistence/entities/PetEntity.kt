@@ -17,5 +17,7 @@ data class PetEntity(
     val lastUpdated: Long,
     val equippedHat: String?,
     val equippedSkin: String?,
-    val totalInteractions: Int
+    val totalInteractions: Int,
+    val xp: Long = 0,
+    val level: Int = 1
 )
