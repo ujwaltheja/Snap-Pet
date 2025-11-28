@@ -237,10 +237,10 @@ private fun getPetColor(petId: String): Color {
 
 private fun getPetName(petId: String): String {
     return when (petId) {
-        "cat" -> "😺 Whiskers"
-        "dog" -> "🐶 Buddy"
-        "bunny" -> "🐰 Fluffy"
-        else -> "🐾 Pet"
+        "cat" -> "Whiskers"
+        "dog" -> "Buddy"
+        "bunny" -> "Fluffy"
+        else -> "Pet"
     }
 }
 

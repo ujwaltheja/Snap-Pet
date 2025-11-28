@@ -39,6 +39,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Initialize logger first for crash reporting
+        val logDir = getExternalFilesDir(null)
+        logger = Logger.getInstance(logDir)
+
+        // Set up crash reporting
+        setupCrashReporting()
+
         // Enable immersive mode
         window.decorView.systemUiVisibility = (
             android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
@@ -50,8 +57,6 @@ class MainActivity : ComponentActivity() {
         )
 
         // Initialize components
-        val logDir = getExternalFilesDir(null)
-        logger = Logger.getInstance(logDir)
         persistenceRepository = PersistenceRepository(applicationContext)
         petController = PetController(persistenceRepository, lifecycleScope, logger)
         storeRepository = StoreRepository(persistenceRepository, logger)
@@ -102,6 +107,30 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         mediaController.cleanup()
+    }
+
+    private fun setupCrashReporting() {
+        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            // Log crash to local file
+            logger.error(
+                "CrashHandler",
+                "Uncaught exception on thread ${thread.name}: ${throwable.message}",
+                throwable
+            )
+
+            // Log full stack trace
+            logger.error(
+                "CrashHandler",
+                "Stack trace:\n${throwable.stackTraceToString()}",
+                throwable
+            )
+
+            // Call the default handler to terminate the app
+            defaultHandler?.uncaughtException(thread, throwable)
+        }
+
+        logger.info("MainActivity", "Crash reporting initialized")
     }
 
     private fun checkAudioPermission() {

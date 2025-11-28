@@ -79,8 +79,6 @@ class Logger(private val logDir: File? = null) {
                     val backupFile = File(dir, "snap_pet_log_old.txt")
                     backupFile.delete()
                     logFile.renameTo(backupFile)
-                } else {
-                    // Keep old log as backup, do nothing
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to write to log file", e)
