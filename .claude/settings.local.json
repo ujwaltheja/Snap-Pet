@@ -15,7 +15,12 @@
       "Bash(adb logcat:*)",
       "Bash(adb install:*)",
       "Bash(adb shell:*)",
-      "Bash(adb uninstall:*)"
+      "Bash(adb uninstall:*)",
+      "Bash(cat:*)",
+      "Bash(./gradlew app-ui:assembleDebug:*)",
+      "Bash(gradlew.bat:*)",
+      "Bash(gradle app-ui:assembleDebug:*)",
+      "Bash(bash gradlew:*)"
     ],
     "deny": [],
     "ask": []

@@ -19,16 +19,20 @@ fun LivingRoomBackground(modifier: Modifier = Modifier) {
         // Wall (Gradient)
         drawRect(
             brush = Brush.verticalGradient(
-                colors = listOf(Color(0xFFE0F7FA), Color(0xFFB2EBF2)),
+                colors = listOf(Color(0xFFE0F7FA), Color(0xFF80DEEA)),
                 startY = 0f,
                 endY = h * 0.7f
             ),
             size = Size(w, h * 0.7f)
         )
 
-        // Floor (Wood)
+        // Floor (Wood Gradient)
         drawRect(
-            color = Color(0xFF8D6E63),
+            brush = Brush.verticalGradient(
+                colors = listOf(Color(0xFF8D6E63), Color(0xFF6D4C41)),
+                startY = h * 0.7f,
+                endY = h
+            ),
             topLeft = Offset(0f, h * 0.7f),
             size = Size(w, h * 0.3f)
         )
@@ -36,7 +40,7 @@ fun LivingRoomBackground(modifier: Modifier = Modifier) {
         // Floor Planks
         for (i in 0 until 10) {
             drawLine(
-                color = Color(0xFF6D4C41),
+                color = Color(0xFF5D4037).copy(alpha = 0.5f),
                 start = Offset(0f, h * 0.7f + (h * 0.3f / 10) * i),
                 end = Offset(w, h * 0.7f + (h * 0.3f / 10) * i),
                 strokeWidth = 2f
@@ -49,12 +53,26 @@ fun LivingRoomBackground(modifier: Modifier = Modifier) {
         val windowX = w * 0.1f
         val windowY = h * 0.15f
 
-        // Window View (Sky)
+        // Window View (Sky Gradient)
         drawRect(
-            color = Color(0xFF4FC3F7),
+            brush = Brush.verticalGradient(
+                colors = listOf(Color(0xFF29B6F6), Color(0xFF81D4FA))
+            ),
             topLeft = Offset(windowX, windowY),
             size = Size(windowW, windowH)
         )
+        // Cloud
+        drawCircle(
+            color = Color.White.copy(alpha = 0.8f),
+            radius = windowW * 0.15f,
+            center = Offset(windowX + windowW * 0.3f, windowY + windowH * 0.3f)
+        )
+        drawCircle(
+            color = Color.White.copy(alpha = 0.8f),
+            radius = windowW * 0.2f,
+            center = Offset(windowX + windowW * 0.5f, windowY + windowH * 0.4f)
+        )
+
         // Window Frame
         drawRect(
             color = Color.White,
@@ -76,9 +94,13 @@ fun LivingRoomBackground(modifier: Modifier = Modifier) {
             strokeWidth = 10f
         )
 
-        // Rug
+        // Rug (Gradient)
         drawOval(
-            color = Color(0xFFEF9A9A),
+            brush = Brush.radialGradient(
+                colors = listOf(Color(0xFFEF9A9A), Color(0xFFE57373)),
+                center = Offset(w * 0.5f, h * 0.82f),
+                radius = w * 0.3f
+            ),
             topLeft = Offset(w * 0.2f, h * 0.75f),
             size = Size(w * 0.6f, h * 0.15f)
         )
@@ -91,9 +113,11 @@ fun KitchenBackground(modifier: Modifier = Modifier) {
         val w = size.width
         val h = size.height
 
-        // Wall (Yellowish)
+        // Wall (Yellowish Gradient)
         drawRect(
-            color = Color(0xFFFFF9C4),
+            brush = Brush.verticalGradient(
+                colors = listOf(Color(0xFFFFF9C4), Color(0xFFFFF59D))
+            ),
             size = Size(w, h * 0.65f)
         )
 
@@ -111,7 +135,7 @@ fun KitchenBackground(modifier: Modifier = Modifier) {
             for (y in 0 until ((h - floorY) / tileSize).toInt() + 1) {
                 if (isBlack) {
                     drawRect(
-                        color = Color(0xFFEEEEEE),
+                        color = Color(0xFFE0E0E0),
                         topLeft = Offset(x * tileSize, floorY + y * tileSize),
                         size = Size(tileSize, tileSize)
                     )
@@ -123,7 +147,9 @@ fun KitchenBackground(modifier: Modifier = Modifier) {
 
         // Fridge Outline (Right side)
         drawRect(
-            color = Color(0xFFE0E0E0),
+            brush = Brush.horizontalGradient(
+                colors = listOf(Color(0xFFF5F5F5), Color(0xFFE0E0E0))
+            ),
             topLeft = Offset(w * 0.75f, h * 0.2f),
             size = Size(w * 0.25f, h * 0.5f)
         )
@@ -144,15 +170,21 @@ fun BedroomBackground(modifier: Modifier = Modifier) {
         val w = size.width
         val h = size.height
 
-        // Wall (Dark Blue)
+        // Wall (Dark Blue Gradient)
         drawRect(
-            color = Color(0xFF3949AB),
+            brush = Brush.verticalGradient(
+                colors = listOf(Color(0xFF3949AB), Color(0xFF283593))
+            ),
             size = Size(w, h * 0.7f)
         )
 
-        // Floor (Carpet)
+        // Floor (Carpet Gradient)
         drawRect(
-            color = Color(0xFF5C6BC0),
+            brush = Brush.verticalGradient(
+                colors = listOf(Color(0xFF5C6BC0), Color(0xFF3F51B5)),
+                startY = h * 0.7f,
+                endY = h
+            ),
             topLeft = Offset(0f, h * 0.7f),
             size = Size(w, h * 0.3f)
         )
@@ -163,16 +195,32 @@ fun BedroomBackground(modifier: Modifier = Modifier) {
         val windowX = w * 0.6f
         val windowY = h * 0.1f
 
-        // Night Sky
+        // Night Sky Gradient
         drawRect(
-            color = Color(0xFF1A237E),
+            brush = Brush.verticalGradient(
+                colors = listOf(Color(0xFF1A237E), Color(0xFF000051))
+            ),
             topLeft = Offset(windowX, windowY),
             size = Size(windowW, windowH)
         )
         
-        // Moon
+        // Stars
+        drawCircle(Color.White, 2f, Offset(windowX + windowW * 0.2f, windowY + windowH * 0.2f))
+        drawCircle(Color.White, 3f, Offset(windowX + windowW * 0.5f, windowY + windowH * 0.1f))
+        drawCircle(Color.White, 2f, Offset(windowX + windowW * 0.8f, windowY + windowH * 0.4f))
+
+        // Moon (Glow)
         drawCircle(
-            color = Color(0xFFFFF176),
+            brush = Brush.radialGradient(
+                colors = listOf(Color(0xFFFFF176), Color.Transparent),
+                center = Offset(windowX + windowW * 0.7f, windowY + windowH * 0.3f),
+                radius = windowW * 0.25f
+            ),
+            radius = windowW * 0.25f,
+            center = Offset(windowX + windowW * 0.7f, windowY + windowH * 0.3f)
+        )
+        drawCircle(
+            color = Color(0xFFFFF59D),
             radius = windowW * 0.15f,
             center = Offset(windowX + windowW * 0.7f, windowY + windowH * 0.3f)
         )
@@ -193,16 +241,18 @@ fun BathroomBackground(modifier: Modifier = Modifier) {
         val w = size.width
         val h = size.height
 
-        // Wall (Tiles)
+        // Wall (Tiles Gradient)
         drawRect(
-            color = Color(0xFFE0F7FA),
+            brush = Brush.verticalGradient(
+                colors = listOf(Color(0xFFE0F7FA), Color(0xFFB2EBF2))
+            ),
             size = Size(w, h * 0.7f)
         )
         // Tile Lines
         val tileSize = 60f
         for (y in 0 until (h * 0.7f / tileSize).toInt()) {
             drawLine(
-                color = Color(0xFFB2EBF2),
+                color = Color(0xFF80DEEA),
                 start = Offset(0f, y * tileSize),
                 end = Offset(w, y * tileSize),
                 strokeWidth = 2f
@@ -210,35 +260,29 @@ fun BathroomBackground(modifier: Modifier = Modifier) {
         }
         for (x in 0 until (w / tileSize).toInt()) {
             drawLine(
-                color = Color(0xFFB2EBF2),
+                color = Color(0xFF80DEEA),
                 start = Offset(x * tileSize, 0f),
                 end = Offset(x * tileSize, h * 0.7f),
                 strokeWidth = 2f
             )
         }
 
-        // Floor (Blue Tiles)
+        // Floor (Blue Tiles Gradient)
         drawRect(
-            color = Color(0xFF80DEEA),
+            brush = Brush.verticalGradient(
+                colors = listOf(Color(0xFF4DD0E1), Color(0xFF00ACC1)),
+                startY = h * 0.7f,
+                endY = h
+            ),
             topLeft = Offset(0f, h * 0.7f),
             size = Size(w, h * 0.3f)
         )
 
         // Bubbles (Randomly placed for effect)
-        drawCircle(
-            color = Color.White.copy(alpha = 0.5f),
-            radius = 20f,
-            center = Offset(w * 0.2f, h * 0.6f)
-        )
-        drawCircle(
-            color = Color.White.copy(alpha = 0.5f),
-            radius = 15f,
-            center = Offset(w * 0.25f, h * 0.55f)
-        )
-        drawCircle(
-            color = Color.White.copy(alpha = 0.5f),
-            radius = 25f,
-            center = Offset(w * 0.8f, h * 0.65f)
-        )
+        val bubbleColor = Color.White.copy(alpha = 0.6f)
+        drawCircle(bubbleColor, 20f, Offset(w * 0.2f, h * 0.6f))
+        drawCircle(bubbleColor, 15f, Offset(w * 0.25f, h * 0.55f))
+        drawCircle(bubbleColor, 25f, Offset(w * 0.8f, h * 0.65f))
+        drawCircle(bubbleColor, 10f, Offset(w * 0.85f, h * 0.58f))
     }
 }

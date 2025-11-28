@@ -83,8 +83,6 @@ fun HomeScreen(
         label = "breath"
     )
 
-    // Background Colors for Rooms - REMOVED, using Graphics now
-
     // Background Layer
     Box(modifier = Modifier.fillMaxSize()) {
         when (currentRoom) {
@@ -112,6 +110,21 @@ fun HomeScreen(
         ) {
             // Top HUD (Coins & Level)
             TopHud(userCoins = user?.coins ?: 0)
+
+            // Pet Switcher (Top Right)
+            user?.let { u ->
+                val unlockedIds = u.unlockedPetIds.split(",").map { it.trim() }
+                PetSwitcher(
+                    unlockedPetIds = unlockedIds,
+                    currentPetId = currentPet?.id,
+                    onPetSelect = { petId ->
+                        scope.launch {
+                            persistenceRepository.updateUser(u.copy(selectedPetId = petId))
+                            petController.loadPet(petId)
+                        }
+                    }
+                )
+            }
 
             // Message Toast
             showMessage?.let { message ->
@@ -143,7 +156,7 @@ fun HomeScreen(
                 Box(
                     modifier = Modifier
                         .offset(y = 60.dp) // Position on floor
-                        .size(300.dp)
+                        .size(320.dp) // Slightly larger
                         .scale(breathScale)
                         .clickable {
                             scope.launch {
@@ -157,7 +170,7 @@ fun HomeScreen(
                     PetView(
                         modifier = Modifier.fillMaxSize(),
                         emotion = emotion.value,
-                        primaryColor = if (currentPet?.id == "dog") Color(0xFF8D6E63) else Color(0xFFFF9F1C), // Brown for dog, Orange for cat
+                        primaryColor = if (currentPet?.id == "dog") Color(0xFF8D6E63) else if (currentPet?.id == "bunny") Color(0xFFF8BBD0) else Color(0xFFFF9F1C), // Brown for dog, Pink for bunny, Orange for cat
                         secondaryColor = Color(0xFFFFF3E0)
                     )
                     
@@ -207,7 +220,7 @@ fun HomeScreen(
                                         contentColor = Color.White
                                     ),
                                     shape = CircleShape,
-                                    modifier = Modifier.size(72.dp)
+                                    modifier = Modifier.size(72.dp).shadow(8.dp, CircleShape)
                                 ) {
                                     Icon(if (isRecording) Icons.Default.Close else Icons.Default.Call, contentDescription = "Talk", modifier = Modifier.size(32.dp))
                                 }
@@ -257,6 +270,43 @@ fun HomeScreen(
     }
 }
 
+@Composable
+fun PetSwitcher(
+    unlockedPetIds: List<String>,
+    currentPetId: String?,
+    onPetSelect: (String) -> Unit
+) {
+    Surface(
+        modifier = Modifier
+            .padding(top = 16.dp, end = 16.dp)
+            .fillMaxWidth()
+            .wrapContentWidth(Alignment.End),
+        color = Color.White.copy(alpha = 0.3f),
+        shape = RoundedCornerShape(20.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.5f))
+    ) {
+        Row(
+            modifier = Modifier.padding(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            unlockedPetIds.forEach { petId ->
+                val isSelected = petId == currentPetId
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(if (isSelected) GamePrimary else Color.White.copy(alpha = 0.5f))
+                        .clickable { onPetSelect(petId) }
+                        .border(2.dp, if (isSelected) Color.White else Color.Transparent, CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(getPlaceholderEmoji(petId), fontSize = 20.sp)
+                }
+            }
+        }
+    }
+}
+
 enum class Room {
     LIVING_ROOM, KITCHEN, BEDROOM, BATHROOM
 }
@@ -271,14 +321,14 @@ fun NeedsDock(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
-            .shadow(8.dp, RoundedCornerShape(32.dp))
+            .shadow(16.dp, RoundedCornerShape(32.dp))
             .clip(RoundedCornerShape(32.dp)),
-        color = Color.White.copy(alpha = 0.95f)
+        color = Color.White.copy(alpha = 0.85f) // Glassmorphism
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
+                .padding(vertical = 12.dp, horizontal = 8.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -327,60 +377,60 @@ fun NeedIcon(
         modifier = Modifier.clickable(onClick = onClick)
     ) {
         Box(
-            contentAlignment = Alignment.BottomCenter
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(48.dp)
+                .background(if (isSelected) color.copy(alpha = 0.2f) else Color.Transparent, CircleShape)
         ) {
             // Icon
             Icon(
                 icon,
                 contentDescription = null,
                 modifier = Modifier
-                    .size(32.dp)
-                    .padding(4.dp),
+                    .size(28.dp),
                 tint = if (isSelected) color else Color.Gray
             )
         }
+        Spacer(modifier = Modifier.height(4.dp))
         // Mini Bar
         LinearProgressIndicator(
             progress = value / 100f,
             modifier = Modifier
                 .width(40.dp)
-                .height(4.dp)
-                .clip(RoundedCornerShape(2.dp)),
+                .height(6.dp)
+                .clip(RoundedCornerShape(3.dp)),
             color = color,
-            trackColor = Color.LightGray.copy(alpha = 0.5f)
+            trackColor = Color.LightGray.copy(alpha = 0.3f)
         )
     }
 }
 
 @Composable
 fun TopHud(userCoins: Int) {
-    Surface(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 16.dp, end = 16.dp),
-        color = Color.Transparent
+            .padding(top = 16.dp),
+        contentAlignment = Alignment.TopCenter
     ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Surface(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .shadow(4.dp, CircleShape),
-                shape = CircleShape,
-                color = Color.White
+        Surface(
+            modifier = Modifier
+                .shadow(8.dp, CircleShape),
+            shape = CircleShape,
+            color = Color.White.copy(alpha = 0.9f)
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(Icons.Default.Star, contentDescription = "Coins", tint = Color(0xFFFFD700))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        "$userCoins",
-                        fontWeight = FontWeight.Bold,
-                        color = GameOnSurface,
-                        fontSize = 18.sp
-                    )
-                }
+                Icon(Icons.Default.Star, contentDescription = "Coins", tint = Color(0xFFFFD700), modifier = Modifier.size(24.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    "$userCoins",
+                    fontWeight = FontWeight.ExtraBold,
+                    color = GameOnSurface,
+                    fontSize = 20.sp
+                )
             }
         }
     }
@@ -391,19 +441,20 @@ fun MessageToast(message: String) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 100.dp),
+            .padding(top = 120.dp),
         contentAlignment = Alignment.TopCenter
     ) {
         Card(
-            modifier = Modifier.shadow(8.dp, RoundedCornerShape(16.dp)),
+            modifier = Modifier.shadow(12.dp, RoundedCornerShape(24.dp)),
             colors = CardDefaults.cardColors(containerColor = GameSecondary),
-            shape = RoundedCornerShape(16.dp)
+            shape = RoundedCornerShape(24.dp)
         ) {
             Text(
                 text = message,
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
                 style = MaterialTheme.typography.titleMedium,
-                color = Color.White
+                color = Color.White,
+                fontWeight = FontWeight.Bold
             )
         }
     }
@@ -415,11 +466,11 @@ fun SmallNavButton(icon: androidx.compose.ui.graphics.vector.ImageVector, label:
         onClick = onClick,
         shape = CircleShape,
         color = Color.White.copy(alpha = 0.9f),
-        shadowElevation = 4.dp,
-        modifier = Modifier.size(48.dp)
+        shadowElevation = 6.dp,
+        modifier = Modifier.size(56.dp)
     ) {
         Box(contentAlignment = Alignment.Center) {
-            Icon(icon, contentDescription = label, tint = GameOnSurface)
+            Icon(icon, contentDescription = label, tint = GameOnSurface, modifier = Modifier.size(28.dp))
         }
     }
 }
@@ -432,24 +483,30 @@ fun GameActionButton(icon: androidx.compose.ui.graphics.vector.ImageVector, labe
         Surface(
             onClick = onClick,
             modifier = Modifier
-                .size(72.dp)
-                .shadow(4.dp, CircleShape),
+                .size(80.dp)
+                .shadow(8.dp, CircleShape),
             shape = CircleShape,
             color = color,
             contentColor = Color.White
         ) {
             Box(contentAlignment = Alignment.Center) {
-                Icon(icon, contentDescription = label, modifier = Modifier.size(36.dp))
+                Icon(icon, contentDescription = label, modifier = Modifier.size(40.dp))
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.Bold,
-            color = GameOnSurface,
-            modifier = Modifier.background(Color.White.copy(alpha = 0.7f), RoundedCornerShape(4.dp)).padding(horizontal = 4.dp)
-        )
+        Surface(
+            color = Color.White.copy(alpha = 0.8f),
+            shape = RoundedCornerShape(12.dp),
+            shadowElevation = 2.dp
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                color = GameOnSurface,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+            )
+        }
     }
 }
 
