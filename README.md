@@ -46,7 +46,7 @@ Snap-Pet/
 - Android Studio Hedgehog (2023.1.1) or later
 - JDK 17
 - Android SDK 34
-- Minimum SDK 24 (Android 7.0)
+- Minimum SDK 26 (Android 8.0)
 
 ### Build Steps
 
